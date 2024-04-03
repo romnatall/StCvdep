@@ -37,5 +37,5 @@ torchvision==0.17.2
 tqdm==4.66.2
 tritonclient==2.44.0
 x2paddle==1.4.1
-git+https://github.com/facebookresearch/detectron2.git #detectron2
-opencv-contrib-python-headless
+pyyaml==5.1
+detectron2
