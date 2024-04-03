@@ -2,7 +2,7 @@ albumentations==1.4.3
 coco_utils==0.0.3
 comet_ml==3.39.2
 coremltools==7.1
-detectron2==0.6
+git+https://github.com/facebookresearch/detectron2.git
 GitPython==3.1.43
 GitPython==3.1.43
 ipython==8.12.3
