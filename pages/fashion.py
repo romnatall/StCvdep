@@ -1,29 +1,20 @@
-# Устанавливаем логгер для детектрона
+
 import detectron2
-# Для печати логов
 from detectron2.utils.logger import setup_logger
-# Инициализируем логгер
 setup_logger()
 from PIL import Image
-# Импорты
 import numpy as np
 import os, json, cv2, random
 
-# Зоопарк моделей (по аналогии с torchvision.models)
 from detectron2 import model_zoo
-# Отдельный класс для предикта разными моделями
 from detectron2.engine import DefaultPredictor
-# Всея конфиг: все будем делать через него
 from detectron2.config import get_cfg
-
-# Для визуализации
 from detectron2.utils.visualizer import Visualizer
-
-# Для собственного датасета
 from detectron2.data import MetadataCatalog, DatasetCatalog
-
 import streamlit as st
 from detectron2.data.datasets import register_coco_instances
+import requests
+from io import BytesIO
 
 
 try:
@@ -67,17 +58,30 @@ st.title("Fashion")
 st.write("""
     загрузите изображение, которое вы хотите отобразить (файл с моей моделью закорраптился, так что тут стандартная, когда-нибудь заменю)
     """)
+uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["jpg", "jpeg", "png"])
+url = st.text_input("Enter image url")
 
-
-img = st.file_uploader("", type=["png", "jpg", "jpeg"])
-
-if img is not None:
+def pred(img):
     img_pil = Image.open(img).convert("RGB")
     img_np = np.array(img_pil)
-    img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)  # Преобразование изображения в формат OpenCV (BGR)
-    
+    img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)  
     st.image(img_np, use_column_width=True)
-    out = predict(img_cv2)  # Предполагается, что функция predict() принимает изображение в формате OpenCV
-
-    
+    out = predict(img_cv2) 
     st.image(out, use_column_width=True)
+
+
+if url: 
+    try:
+        response = requests.get(url)
+        if response.status_code == 200: 
+            img = BytesIO(response.content)  
+            pred(img)
+        else:
+            st.warning("Invalid URL. Make sure the URL is correct and the image exists.")
+    except requests.exceptions.MissingSchema:
+        st.warning("Invalid URL format. Make sure to include 'http://' or 'https://'")
+
+if uploaded_files is not None:
+        for img in uploaded_files:
+            pred(img)
+
